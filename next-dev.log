@@ -1,0 +1,47 @@
+
+> my-app@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.197:3000
+
+✓ Starting...
+✓ Ready in 225ms
+ HEAD / 200 in 114ms (compile: 80ms, render: 34ms)
+ GET / 200 in 33ms (compile: 4ms, render: 29ms)
+✓ Compiled in 130ms
+ GET / 200 in 68ms (compile: 41ms, render: 27ms)
+ OPTIONS /chat 404 in 222ms (compile: 202ms, render: 20ms)
+ GET / 200 in 35ms (compile: 8ms, render: 27ms)
+ OPTIONS /chat 404 in 29ms (compile: 6ms, render: 23ms)
+✓ Compiled in 6ms
+ GET / 200 in 63ms (compile: 37ms, render: 26ms)
+ GET / 200 in 35ms (compile: 16ms, render: 19ms)
+ GET / 200 in 14ms (compile: 852µs, render: 13ms)
+ GET / 200 in 15ms (compile: 763µs, render: 14ms)
+ GET / 200 in 18ms (compile: 559µs, render: 17ms)
+ GET / 200 in 19ms (compile: 750µs, render: 18ms)
+ GET / 200 in 15ms (compile: 745µs, render: 14ms)
+ GET / 200 in 11ms (compile: 562µs, render: 10ms)
+ GET / 200 in 7ms (compile: 1394µs, render: 5ms)
+✓ Compiled in 7ms
+ GET / 200 in 64ms (compile: 37ms, render: 27ms)
+ POST /api/chat 200 in 126ms (compile: 117ms, render: 9ms)
+✓ Compiled in 13ms
+ GET / 200 in 33ms (compile: 4ms, render: 29ms)
+ POST /api/chat 200 in 1109ms (compile: 5ms, render: 1104ms)
+ POST /api/chat 200 in 1464ms (compile: 3ms, render: 1461ms)
+ POST /api/chat 200 in 5.5s (compile: 3ms, render: 5.5s)
+ GET / 200 in 31ms (compile: 4ms, render: 27ms)
+ GET / 200 in 35ms (compile: 7ms, render: 28ms)
+ POST /api/chat 200 in 15.6s (compile: 2ms, render: 15.6s)
+ POST /api/chat 200 in 34.8s (compile: 3ms, render: 34.8s)
+ GET / 200 in 24ms (compile: 1668µs, render: 22ms)
+ POST /api/chat 200 in 10.8s (compile: 3ms, render: 10.7s)
+ POST /api/chat 200 in 1165ms (compile: 5ms, render: 1160ms)
+ GET / 200 in 32ms (compile: 6ms, render: 25ms)
+ POST /api/chat 200 in 1162ms (compile: 5ms, render: 1157ms)
+ POST /api/chat 200 in 2.8s (compile: 3ms, render: 2.8s)
+ POST /api/chat 200 in 3.8s (compile: 2ms, render: 3.8s)
+[?25h
