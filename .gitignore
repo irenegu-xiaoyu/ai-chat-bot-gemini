@@ -43,7 +43,7 @@ venv/
 next-env.d.ts
 
 # gemini api
-gemeni_api_config.py
+gemini_api_config.py
 
 # IDE
 .vscode/
