@@ -2,13 +2,20 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-type Message = { id: number; sender: "user" | "bot"; text: string };
+type Message = {
+  id: number;
+  sender: "user" | "bot";
+  text: string;
+  isCancelled?: boolean;
+};
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [sessionId] = useState(() => crypto.randomUUID());
   const listRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef(1);
+  const activeControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     // scroll to bottom when messages change
@@ -24,34 +31,84 @@ export default function Home() {
     setMessages((p) => [...p, userMsg]);
     setInput("");
 
+    // Create a bot message placeholder and then stream into it as chunks arrive
+    const botId = idRef.current++;
+    const botMsg: Message = { id: botId, sender: "bot", text: "" };
+    setMessages((p) => [...p, botMsg]);
+
     try {
+      // If there's an ongoing request, cancel it before starting a new one.
+      if (activeControllerRef.current) {
+        try {
+          activeControllerRef.current.abort();
+        } catch {}
+        activeControllerRef.current = null;
+      }
+
+      const controller = new AbortController();
+      activeControllerRef.current = controller;
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, session_id: sessionId }),
+        signal: controller.signal,
       });
 
-      if (!res.ok) {
-        throw new Error(`server error: ${res.status}`);
+      if (!res.ok || !res.body) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`server error: ${res.status} ${errText}`);
       }
 
-      const data = await res.json();
-      const botMsg: Message = {
-        id: idRef.current++,
-        sender: "bot",
-        text: data.reply,
-      };
-      setMessages((p) => [...p, botMsg]);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+      let done = false;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        if (readerDone) {
+          done = true;
+          break;
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        // append chunk to bot message
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === botId ? { ...m, text: m.text + chunk } : m,
+          ),
+        );
+      }
+
+      // ensure reader is closed
+      try {
+        await reader.cancel();
+      } catch {}
+
+      if (activeControllerRef.current === controller)
+        activeControllerRef.current = null;
     } catch (err: any) {
-      // fallback to local echo on network / server error
-      const botMsg: Message = {
+      // If the error is an abort triggered by starting a new request, mark the partial bot
+      // message as cancelled so the user sees that it was intentionally stopped.
+      if (err?.name === "AbortError") {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === botId && m.sender === "bot"
+              ? {
+                  ...m,
+                  text: m.text || "(cancelled)",
+                  isCancelled: true,
+                }
+              : m,
+          ),
+        );
+        return;
+      }
+
+      const botMsgErr: Message = {
         id: idRef.current++,
         sender: "bot",
-        text: `Error contacting backend, fallback reply: ${
-          err?.message ?? String(err)
-        }`,
+        text: `Error contacting backend, fallback reply: ${err?.message ?? String(err)}`,
       };
-      setMessages((p) => [...p, botMsg]);
+      setMessages((p) => [...p, botMsgErr]);
     }
   };
 
@@ -94,7 +151,12 @@ export default function Home() {
                         : "bg-zinc-100 text-zinc-900 dark:bg-[#111] dark:text-zinc-200"
                     }`}
                   >
-                    {m.text}
+                    <span>{m.text}</span>
+                    {m.isCancelled ? (
+                      <span className="text-xs text-zinc-500 ml-2">
+                        (cancelled)
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               ))

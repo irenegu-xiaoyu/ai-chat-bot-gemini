@@ -2,3 +2,4 @@ fastapi==0.106.0
 uvicorn[standard]==0.23.2
 pydantic==2.6.2
 requests==2.31.0
+google-genai
